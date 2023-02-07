@@ -14,6 +14,13 @@ app.register_blueprint(app_views)
 CORS(app, resources={r"/api/v1/*": {"origins": "*"}})
 
 
+auth = getenv("AUTH_TYPE", None)
+
+if auth:
+    from api.v1.auth.auth import Auth
+    auth = Auth()
+
+
 @app.errorhandler(401)
 def resource_not_found(e):
     """ Unauthorized handler"""
@@ -31,6 +38,23 @@ def not_found(error) -> str:
     """ Not found handler
     """
     return jsonify({"error": "Not found"}), 404
+
+
+@app.before_request
+def validate_auth() -> None:
+    """ Validates authentication if needed
+    """
+    if auth:
+        excluded_paths = [
+            '/api/v1/status/',
+            '/api/v1/unauthorized/',
+            '/api/v1/forbidden/'
+            ]
+        if auth.require_auth(request.path, excluded_paths):
+            if auth.authorization_header(request) is None:
+                abort(401)
+            if auth.current_user(request) is None:
+                abort(403)
 
 
 if __name__ == "__main__":

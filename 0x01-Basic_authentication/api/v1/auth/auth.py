@@ -20,7 +20,14 @@ class Auth:
         Returns:
             bool: _description_
         """
-        return False
+        if path is None or not excluded_paths:
+            return True
+        for excl_path in excluded_paths:
+            if excl_path.endswith('*') and path.startswith(excl_path[:-1]):
+                return False
+            elif excl_path in {path, path + '/'}:
+                return False
+        return True
 
     def authorization_header(self, request=None) -> str:
         """that returns None - request will be the Flask request object

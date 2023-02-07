@@ -103,4 +103,4 @@ class BasicAuth(Auth):
                                     auth_header_base64)
         email, pwd = self.extract_user_credentials(auth_header)
         user = self.user_object_from_credentials(email, pwd)
-        return
+        return user

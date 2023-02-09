@@ -49,6 +49,7 @@ def validate_auth() -> None:
     """ Validates authentication if needed
     """
     if auth:
+        request.current_user = auth.current_user(request)
         excluded_paths = [
             '/api/v1/status/',
             '/api/v1/unauthorized/',
